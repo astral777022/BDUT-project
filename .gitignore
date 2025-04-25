@@ -1,0 +1,8 @@
+# direnv
+.direnv
+
+#venv
+.venv
+
+# pycache
+__pycache__
