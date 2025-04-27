@@ -121,11 +121,11 @@ $(document).ready(function() {
                 },
                 name: {
                     required: true,
-                    regex: '^[а-яА-ЯёЁa-zA-Z]+$'
+                    regex: '^[а-яА-ЯёЁіІїЇєЄґҐa-zA-Z]+$'
                 },
                 surname: {
                     required: true,
-                    regex: '^[а-яА-ЯёЁa-zA-Z]+$'
+                    regex: '^[а-яА-ЯёЁіІїЇєЄґҐa-zA-Z]+$'
                 },
                 tel: {
                     required: true,
