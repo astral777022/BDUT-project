@@ -117,7 +117,7 @@ $(document).ready(function() {
             rules: {
                 login: {
                     required: true,
-                    regex: '^[а-яА-ЯёЁa-zA-Z]+$'
+                   // regex: '^[а-яА-ЯёЁa-zA-Z]+$'
                 },
                 name: {
                     required: true,
