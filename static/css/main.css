@@ -933,3 +933,26 @@ tr {
 .box-modal {
 	background: url(../img/white-1209552_1920.jpg) center / cover;
 }
+
+.success-message {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    max-width: 400px;
+    margin: 20% auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.success-message h3 {
+    color: #28a745;
+    margin-bottom: 15px;
+}
+
+.success-message p {
+    font-size: 16px;
+}
+
+.success-message strong {
+    color: #007bff;
+}
