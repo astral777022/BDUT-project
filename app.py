@@ -18,7 +18,11 @@ login_manager.login_view = 'login'                                  # Вказу
 # Модель користувача
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), unique=True)
+    login =  db.Column(db.String(150), unique=True)
+    name = db.Column(db.String(150))
+    surname = db.Column(db.String(150))
+    tel = db.Column(db.String(150))
+    clas = db.Column(db.Integer)
     password = db.Column(db.String(150))
     role = db.Column(db.String(50))  # 'teacher', 'student', 'parent'
 
@@ -47,27 +51,25 @@ def home():
 
     return f'{greeting} Ваш логин: {current_user.name}'
 
-#class Register(db.Model):
-#    id = db.Column(db.Integer, primary_key=True)
-#    login = db.Column(db.String(15), nullable=False)
-#    name = db.Column(db.String(300), nullable=False)
-#    text = db.Column(db.Text, nullable=False)
-
 # Регистрація
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        login = request.form['login']
         name = request.form['name']
+        surname = request.form['surname']
+        tel = request.form['tel']
+        clas = int(request.form['clas'])  # Преобразуем строку в целое число
         password = request.form['password']
         role = request.form['role']
 
         # Перевірка, чи існує
-        if User.query.filter_by(name=name).first():
+        if User.query.filter_by(login=login).first():
             flash('Такий користувач вже існує')
             return redirect(url_for('register'))
 
         # Створення нового користувача
-        new_user = User(name=name, password=password, role=role)
+        new_user = User(login=login, name=name, surname=surname, tel=tel, clas=clas, password=password, role=role)
         
         try:
             db.session.add(new_user)
