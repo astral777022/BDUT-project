@@ -135,6 +135,10 @@ def student():
 def calendar():
     return render_template('calendar.html')
 
+@app.route("/admin")                                                 # Календар
+def admin():
+    return render_template('admin.html')
+
 @app.route("/api/events", methods=['GET'])
 def get_events():
     events = Event.query.all()
