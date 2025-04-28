@@ -208,7 +208,7 @@ $(document).ready(function() {
                                     // створюємо та показуємо повідомлення
                                     $('#overlay').html('<div class="success-message" style="background: white; padding: 20px; border-radius: 5px; text-align: center;">' +
                                     '<h3>Дякуємо за реєстрацію на нашій платформі!</h3>' +
-                                    '<p>Ваш логин: <strong>' + userLogin + '</strong></p>' +
+                                    '<p>Ваш логін: <strong>' + userLogin + '</strong></p>' +
                                     '</div>');
                                     $('#overlay').fadeIn();
                                     $form.trigger('reset');
