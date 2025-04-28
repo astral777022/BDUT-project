@@ -117,7 +117,7 @@ $(document).ready(function() {
             rules: {
                 login: {
                     required: true,
-                   // regex: '^[а-яА-ЯёЁa-zA-Z]+$'
+                //    regex: '^[а-яА-ЯёЁa-zA-Z-1-9]+$'
                 },
                 name: {
                     required: true,
@@ -203,9 +203,16 @@ $(document).ready(function() {
                                     $('#loader').fadeOut();
                                 }, 800);
                                 setTimeout(function() {
+                                    // Отримуємо введенный логин
+                                    var userLogin = $('#login-f1').val();
+                                    // створюємо та показуємо повідомлення
+                                    $('#overlay').html('<div class="success-message" style="background: white; padding: 20px; border-radius: 5px; text-align: center;">' +
+                                    '<h3>Дякуємо за реєстрацію на нашій платформі!</h3>' +
+                                    '<p>Ваш логин: <strong>' + userLogin + '</strong></p>' +
+                                    '</div>');
                                     $('#overlay').fadeIn();
                                     $form.trigger('reset');
-                                    //строки для остлеживания целей в Я.Метрике и Google Analytics
+                                    //рядки для відслідковування цілей в Я.Метрике и Google Analytics
                                 }, 1100);
                                 $('#overlay').on('click', function(e) {
                                     $(this).fadeOut();
