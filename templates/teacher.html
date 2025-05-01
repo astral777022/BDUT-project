@@ -4,374 +4,85 @@
 	сторінка директора
 {% endblock %}
 
-<body>
-	{% block content %}
-	<header class="header" id="header">
-  	<div class="container">
-    	<div class="row d-flex align-items-center">
-      		<div class="col-3 col-md-4 col-lg-2">
-        		<a href="index.html">
+{% block content %}
+<header class="header" id="header">
+	<div class="container">
+		<div class="row d-flex align-items-center">
+			<div class="col-3 col-md-4 col-lg-2">
+				<a href="index.html">
 					<img class="img-fluid logo" src="{{url_for('static', filename='img/low.png')}}" alt="logo">
 				</a>
-      		</div>
+			</div>
 			<!-- Поле пошуку -->
-     		<div class="col-9 serh d-lg-flex col-md-8 col-lg-7 flex items-center">
-		  		<div class="search-wrapper">
+			<div class="col-9 serh d-lg-flex col-md-8 col-lg-7 flex items-center">
+				<div class="search-wrapper">
 					<input type="text" placeholder="Пошук..." class="search-input" />
 					<button class="search-button">🔍</button>
 				</div>
 			</div>
-      		<div class="col-12 reg-in col-md-12 d-lg-flex col-lg-3 justify-content-end align-items-center menu-collapse">
-        	<!-- Меню -->
-        		<nav class="menu">
-          			<ul class="menu__list d-flex">
-            			<li class="menu__item">
-              				<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-            			</li>
-          			</ul>
-        		</nav>
-      		</div>
-    	</div>
-  	</div>
-	</header>
+			<div class="col-12 reg-in col-md-12 d-lg-flex col-lg-3 justify-content-end align-items-center menu-collapse">
+				<!-- Меню -->
+				<nav class="menu">
+					<ul class="menu__list d-flex">
+						<li class="menu__item">
+							<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+</header>
 
 <section class="cal-2">
 	<div class="container">
 		<div class="row">
 			<div class="center d-flex col-sm-12 col-md-6"> 
 				<div class="calendar-wrapper">
-				    <button id="btnPrev" type="button">Попередній</button>
-				    <button id="btnNext" type="button">Наступний</button>
-					 <div id="divCal"></div>
-					 <a href="#" class="podii-2">Всі події цього місяця</a>
-					 <a href="#" class="task-for-one">Створити особисте завдання</a>
-					 <a href="#" class="task-for-group">Створити групове завдання</a>
-					 <a href="#" class="assessment">Оцінювання</a>
+					<div class="calendar-header">
+						<button id="btnPrev" type="button">Попередній</button>
+						<span id="monthYear"></span>
+						<button id="btnNext" type="button">Наступний</button>
+					</div>
+					<div id="divCal" class="calendar-table"></div>
+					<div class="calendar-buttons">
+						<a href="#" class="podii-2">Всі події цього місяця</a>
+						<a href="#" class="task-for-one">Створити особисте завдання</a>
+						<a href="#" class="task-for-group">Створити групове завдання</a>
+						<a href="#" class="assessment">Оцінювання</a>
+					</div>
 				</div>
-				<script type="text/javascript">
-					var Cal = function(divId) {
-						this.divId = divId;
-						this.DaysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
-						this.Months = ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
-						var d = new Date();
-						this.currMonth = d.getMonth();
-						this.currYear = d.getFullYear();
-						this.currDay = d.getDate();
-						this.events = [];
-					};
-				
-					Cal.prototype.fetchEvents = async function() {
-						try {
-							const response = await fetch('/api/events', {
-								method: 'GET',
-								headers: {
-									'Content-Type': 'application/json'
-								}
-							});
-							this.events = await response.json();
-							console.log('Події з API:', this.events);
-						} catch (error) {
-							console.error('Помилка при отриманні подій:', error);
-						}
-					};
-				
-					Cal.prototype.nextMonth = function() {
-						if (this.currMonth == 11) {
-							this.currMonth = 0;
-							this.currYear = this.currYear + 1;
-						} else {
-							this.currMonth = this.currMonth + 1;
-						}
-						this.showcurr();
-					};
-				
-					Cal.prototype.previousMonth = function() {
-						if (this.currMonth == 0) {
-							this.currMonth = 11;
-							this.currYear = this.currYear - 1;
-						} else {
-							this.currMonth = this.currMonth - 1;
-						}
-						this.showcurr();
-					};
-				
-					Cal.prototype.showcurr = function() {
-						this.showMonth(this.currYear, this.currMonth);
-					};
-				
-					Cal.prototype.showMonth = function(y, m) {
-						var d = new Date();
-						var firstDayOfMonth = new Date(y, m, 7).getDay();
-						var lastDateOfMonth = new Date(y, m + 1, 0).getDate();
-						var lastDayOfLastMonth = m == 0 ? new Date(y - 1, 11, 0).getDate() : new Date(y, m, 0).getDate();
-				
-						var html = '<table>';
-						html += '<thead><tr>';
-						html += '<td colspan="7">' + this.Months[m] + ' ' + y + '</td>';
-						html += '</tr></thead>';
-						html += '<tr class="days">';
-						for (var i = 0; i < this.DaysOfWeek.length; i++) {
-							html += '<td>' + this.DaysOfWeek[i] + '</td>';
-						}
-						html += '</tr>';
-				
-						var i = 1;
-						do {
-							var dow = new Date(y, m, i).getDay();
-							if (dow == 1) {
-								html += '<tr>';
-							} else if (i == 1) {
-								html += '<tr>';
-								var k = lastDayOfLastMonth - firstDayOfMonth + 1;
-								for (var j = 0; j < firstDayOfMonth; j++) {
-									html += '<td class="not-current">' + k + '</td>';
-									k++;
-								}
-							}
-				
-							var currentDate = new Date(y, m, i);
-							var eventsForDay = this.events.filter(event => {
-								var eventDate = new Date(event.date);
-								return eventDate.getFullYear() === y &&
-									   eventDate.getMonth() === m &&
-									   eventDate.getDate() === i;
-							});
-				
-							var hasEvent = eventsForDay.length > 0;
-							var isPastEvent = false;
-							if (hasEvent) {
-								const now = new Date();
-								isPastEvent = eventsForDay.every(event => {
-									const eventDate = new Date(event.date);
-									return eventDate < now;
-								});
-							}
-				
-							var chk = new Date();
-							var chkY = chk.getFullYear();
-							var chkM = chk.getMonth();
-							if (chkY == this.currYear && chkM == this.currMonth && i == this.currDay) {
-								html += `<td class="today${hasEvent ? (isPastEvent ? ' past-event-day' : ' event-day') : ''}"><a href="#" class="but-block but-block-${i}">${i}</a></td>`;
-							} else {
-								html += `<td class="normal${hasEvent ? (isPastEvent ? ' past-event-day' : ' event-day') : ''}"><a href="#" class="but-block but-block-${i}">${i}</a></td>`;
-							}
-				
-							if (dow == 0) {
-								html += '</tr>';
-							} else if (i == lastDateOfMonth) {
-								var k = 1;
-								for (dow; dow < 7; dow++) {
-									html += '<td class="not-current">' + k + '</td>';
-									k++;
-								}
-							}
-							i++;
-						} while (i <= lastDateOfMonth);
-				
-						html += '</table>';
-						document.getElementById(this.divId).innerHTML = html;
-					};
-				
-					let calendarInstance;
-					window.onload = async function() {
-						calendarInstance = new Cal("divCal");
-						await calendarInstance.fetchEvents();
-						calendarInstance.showcurr();
-				
-						getId('btnNext').onclick = function() {
-							calendarInstance.nextMonth();
-						};
-						getId('btnPrev').onclick = function() {
-							calendarInstance.previousMonth();
-						};
-				
-						document.querySelector('.general-event').onclick = function(e) {
-							e.preventDefault();
-							console.log('Кнопка "Додати загальну подію" натиснута');
-							showEventForm();
-						};
-				
-						document.querySelector('.podii-2').onclick = function(e) {
-							e.preventDefault();
-							console.log('Кнопка "Всі події цього місяця" натиснута');
-							showAllEvents();
-						};
-					};
-				
-					function getId(id) {
-						return document.getElementById(id);
-					}
-				
-					function showEventForm() {
-						console.log('Відкривається форма додавання події');
-						document.getElementById('formTitle').textContent = 'Додати загальну подію';
-						document.getElementById('eventId').value = '';
-						document.getElementById('eventTitle').value = '';
-				
-						// Ініціалізуємо flatpickr для поля eventDate
-						flatpickr("#eventDate", {
-							enableTime: true, // Дозволяємо вибір часу
-							dateFormat: "Y-m-d H:i", // Формат дати: "2025-04-18 17:00"
-							defaultDate: new Date(), // За замовчуванням поточна дата і час
-							time_24hr: true, // 24-годинний формат
-							minuteIncrement: 1, // Крок хвилин — 1
-							locale: {
-								firstDayOfWeek: 1 // Тиждень починається з понеділка
-							}
-						});
-				
-						try {
-							$.arcticmodal({
-								content: '#exampleModal-10'
-							});
-						} catch (error) {
-							console.error('Помилка з arcticmodal:', error);
-							alert('Помилка при відкритті форми. Перевірте підключення бібліотеки arcticmodal.');
-						}
-					}
-				
-					async function saveEvent(event) {
-						event.preventDefault();
-						console.log('saveEvent викликано');
-				
-						const eventId = document.getElementById('eventId').value;
-						const title = document.getElementById('eventTitle').value;
-						const date = document.getElementById('eventDate').value; // "2025-04-18 17:00"
-				
-						if (!title || !date) {
-							console.log('Назва або дата не заповнені');
-							alert('Будь ласка, заповніть обов’язкові поля (назва і дата)');
-							return;
-						}
-				
-						const eventDate = new Date(date);
-						const year = eventDate.getFullYear();
-						const month = String(eventDate.getMonth() + 1).padStart(2, '0');
-						const day = String(eventDate.getDate()).padStart(2, '0');
-						const hours = String(eventDate.getHours()).padStart(2, '0');
-						const minutes = String(eventDate.getMinutes()).padStart(2, '0');
-						const seconds = String(eventDate.getSeconds()).padStart(2, '0');
-						const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-				
-						const eventData = {
-							title: title,
-							date: formattedDate
-						};
-						console.log('Дані для відправки:', eventData);
-				
-						try {
-							let response;
-							if (eventId) {
-								console.log('Оновлення події з ID:', eventId);
-								response = await fetch(`/api/events/${eventId}`, {
-									method: 'PUT',
-									headers: { 'Content-Type': 'application/json' },
-									body: JSON.stringify(eventData)
-								});
-							} else {
-								console.log('Створення нової події');
-								response = await fetch('/api/events', {
-									method: 'POST',
-									headers: { 'Content-Type': 'application/json' },
-									body: JSON.stringify(eventData)
-								});
-							}
-				
-							console.log('Статус відповіді:', response.status);
-							if (response.ok) {
-								console.log('Подія успішно збережена');
-								await calendarInstance.fetchEvents();
-								calendarInstance.showcurr();
-								$.arcticmodal('close');
-							} else {
-								console.error('Помилка сервера:', response.status);
-								alert('Помилка при збереженні події');
-							}
-						} catch (error) {
-							console.error('Помилка при відправці запиту:', error);
-							alert('Помилка при збереженні події');
-						}
-					}
-				
-					function showAllEvents() {
-						console.log('Відкривається список подій місяця');
-						document.getElementById('currentMonth').textContent = 
-							calendarInstance.Months[calendarInstance.currMonth] + ' ' + calendarInstance.currYear;
-				
-						const eventList = document.getElementById('eventList');
-						eventList.innerHTML = '';
-				
-						const daysInMonth = new Date(calendarInstance.currYear, calendarInstance.currMonth + 1, 0).getDate();
-				
-						for (let day = 1; day <= daysInMonth; day++) {
-							const eventsForDay = calendarInstance.events.filter(event => {
-								const eventDate = new Date(event.date);
-								return eventDate.getFullYear() === calendarInstance.currYear &&
-									   eventDate.getMonth() === calendarInstance.currMonth &&
-									   eventDate.getDate() === day;
-							});
-				
-							const li = document.createElement('li');
-							li.classList.add('event-item');
-							if (eventsForDay.length > 0) {
-								li.classList.add('event-present');
-								const eventTitlesWithTime = eventsForDay.map(event => {
-									const eventDate = new Date(event.date);
-									const hours = String(eventDate.getHours()).padStart(2, '0');
-									const minutes = String(eventDate.getMinutes()).padStart(2, '0');
-									const time = `${hours}:${minutes}`;
-									return `${event.title} (${time})`;
-								}).join(', ');
-								li.innerHTML = `<p>${day}</p><p>${eventTitlesWithTime}</p>`;
-							} else {
-								li.classList.add('event-absent');
-								li.innerHTML = `<p>${day}</p><p>Не запланована ніяка подія</p>`;
-							}
-							eventList.appendChild(li);
-						}
-				
-						try {
-							$.arcticmodal({
-								content: '#exampleModal-5'
-							});
-						} catch (error) {
-							console.error('Помилка з arcticmodal:', error);
-							alert('Помилка при відкритті списку подій. Перевірте підключення бібліотеки arcticmodal.');
-						}
-					}
-				</script>
-         </div>
-         <div class="center col-sm-12 col-md-6"> 
-	      	<div class="students">
-	      		<div class="students-title">
-	      			<h2>Компьютерний клас</h2> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-	      			<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-	      		</div>
+			</div>
+			<div class="center col-sm-12 col-md-6"> 
+				<div class="students">
+					<div class="students-title">
+						<h2>Комп'ютерний клас</h2>
+						<p>Ім'я Призвіще (<span>Логін</span>)</p>
+					</div>
 					<ul class="stud-list">
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації --></li>
-						<!-- Сюди додаються нові учні в якості нового пункту в тегі <li> -->
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
+						<li class="student-item"><p>Ім'я Призвіще (<span>Логін</span>)</p></li>
 					</ul>
 					<a href="#" class="remove-student">Видалити учня з бази</a>
 				</div>
@@ -382,230 +93,579 @@
 		</div>
 	</div>
 </section>
+{% endblock %}
 
-	<!-- Модальні вікна -->
-
-<div style="display: none;"> <!--   Вікно кліка на дні у календарі   -->
-    <div class="box-modal" id="exampleModal-3">
-        <div class="box-modal_close arcticmodal-close"><img src="img/close.png" class="close"></div>
-        <div>
-        		<div class="date">
-        			<p>Сюди повинна потрапляти поточна дата</p>
-        		</div>
-        		<div class="desc-date">
-        			<p>Події відсутні</p>
-        		</div> 
-        		<a href="#" class="desc-date-in">Додати подію</a>
-        </div>
-    </div>
+{% block ModalWindows %}
+<!-- Модальні вікна -->
+<div style="display: none;">
+	<div class="box-modal" id="exampleModal-3">
+		<div class="box-modal_close arcticmodal-close"><img src="{{url_for('static', filename='img/close.png')}}" class="close"></div>
+		<div>
+			<div class="date">
+				<p id="selectedDate"></p>
+			</div>
+			<div class="desc-date" id="eventDetails">
+				<p>Події відсутні</p>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div style="display: none;">
-    <div class="box-modal" id="exampleModal-5">
-        <div class="box-modal_close arcticmodal-close"><img src="img/close.png" class="close"></div>
-        <div class="date">
-            <p id="currentMonth"></p>
-        </div>
-        <ul class="list-event" id="eventList"></ul>
-    </div>
+	<div class="box-modal" id="exampleModal-5">
+		<div class="box-modal_close arcticmodal-close"><img src="{{url_for('static', filename='img/close.png')}}" class="close"></div>
+		<div class="date">
+			<p id="currentMonth"></p>
+		</div>
+		<ul class="list-event" id="eventList"></ul>
+	</div>
 </div>
 
+<div style="display: none;">
+	<div class="box-modal" id="exampleModal-6">
+		<div class="box-modal_close arcticmodal-close"><img src="{{url_for('static', filename='img/close.png')}}" class="close"></div>
+		<div>
+			<textarea class="desk-task" name="desk-task" placeholder="Опишіть завдання"></textarea>
+			<select name="class" class="class">
+				<option value="0">Оберіть учня</option>
+				<option value="1">Учень 1</option>
+				<option value="2">Учень 2</option>
+				<option value="3">Учень 3</option>
+				<option value="4">Учень 4</option>
+				<option value="5">Учень 5</option>
+				<option value="6">Учень 6</option>
+			</select>
+			<div>
+				<p class="example_task-date">Строк виконання до: <br>
+					<span><input id="namb" class="namb-input" type="text" name="namber" placeholder="Забронюйте дату віконання"></span></p>
+			</div>
+			<a href="#" class="task-gr">Відправити завдання</a>
+		</div>
+	</div>
+</div>
 
-<div style="display: none;"> <!--   Особисте завдання   -->
-    <div class="box-modal" id="exampleModal-6">
-        <div class="box-modal_close arcticmodal-close"><img src="img/close.png" class="close"></div>
-        <div>
-        		<textarea class="desk-task" name="desk-task" placeholder="Опишіть завдання"></textarea>
-        		<select name="class" class="class">
-	         	  <option value="0">Оберіть учня</option>
-					  <option value="1">Учень 1</option>
-					  <option value="2">Учень 2</option>
-					  <option value="3">Учень 3</option>
-					  <option value="4">Учень 4</option>
-					  <option value="5">Учень 5</option>
-					  <option value="6">Учень 6</option>
-				</select>
-				<div>
-					<p class="example_task-date">Строк виконання до: <br>
-						<span><input id="namb" class="namb-input" type="text" name="namber" placeholder="Забронюйте дату віконання"></span></p>
-				</div>
+<div style="display: none;">
+	<div class="box-modal" id="exampleModal-7">
+		<div class="box-modal_close arcticmodal-close"><img src="{{url_for('static', filename='img/close.png')}}" class="close"></div>
+		<div>
+			<textarea class="desk-task" name="desk-task" placeholder="Опишіть завдання"></textarea>
+			<h3 class="st-task-gr">Виберіть учнів:</h3>
+			<ul class="stud-list-2 d-flex">
+				<li class="student-item d-flex">
+					<input type="checkbox">
+					<p>Ім'я Призвіще (<span>Логін</span>)</p>
+				</li>
+				<li class="student-item d-flex">
+					<input type="checkbox">
+					<p>Ім'я Призвіще (<span>Логін</span>)</p>
+				</li>
+				<li class="student-item d-flex">
+					<input type="checkbox">
+					<p>Ім'я Призвіще (<span>Логін</span>)</p>
+				</li>
+				<li class="student-item d-flex">
+					<input type="checkbox">
+					<p>Ім'я Призвіще (<span>Логін</span>)</p>
+				</li>
+				<li class="student-item d-flex">
+					<input type="checkbox">
+					<p>Ім'я Призвіще (<span>Логін</span>)</p>
+				</li>
+				<li class="student-item d-flex">
+					<input type="checkbox">
+					<p>Ім'я Призвіще (<span>Логін</span>)</p>
+				</li>
+				<li class="student-item d-flex">
+					<input type="checkbox">
+					<p>Ім'я Призвіще (<span>Логін</span>)</p>
+				</li>
+				<li class="student-item d-flex">
+					<input type="checkbox">
+					<p>Ім'я Призвіще (<span>Логін</span>)</p>
+				</li>
+				<li class="student-item d-flex">
+					<input type="checkbox">
+					<p>Ім'я Призвіще (<span>Логін</span>)</p>
+				</li>
+			</ul>
+			<div>
+				<p class="example_task-date">Строк виконання до: <br>
+					<span><input id="namb" class="namb-input" type="text" name="namber" placeholder="Забронюйте дату віконання"></span>
+				</p>
 				<a href="#" class="task-gr">Відправити завдання</a>
-        </div>
-    </div>
-</div>
-
-<div style="display: none;"> <!--   Групове завдання   -->
-    <div class="box-modal" id="exampleModal-7">
-        <div class="box-modal_close arcticmodal-close"><img src="img/close.png" class="close"></div>
-        <div>
-        		<textarea class="desk-task" name="desk-task" placeholder="Опишіть завдання"></textarea>
-        		<h3 class="st-task-gr">Виберіть учнів:</h3>
-        		<ul class="stud-list-2 d-flex">
-						<li class="student-item d-flex">
-							<input type="checkbox">
-							<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-						</li>
-						<li class="student-item d-flex">
-							<input type="checkbox">
-							<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-						</li>
-						<li class="student-item d-flex">
-							<input type="checkbox">
-							<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-						</li>
-						<li class="student-item d-flex">
-							<input type="checkbox">
-							<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-						</li>
-						<li class="student-item d-flex">
-							<input type="checkbox">
-							<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-						</li>
-						<li class="student-item d-flex">
-							<input type="checkbox">
-							<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-						</li>
-						<li class="student-item d-flex">
-							<input type="checkbox">
-							<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-						</li>
-						<li class="student-item d-flex">
-							<input type="checkbox">
-							<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-						</li>
-						<li class="student-item d-flex">
-							<input type="checkbox">
-							<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-						</li>
-					</ul>
-				<div>
-					<p class="example_task-date">Строк виконання до: <br>
-						<span><input id="namb" class="namb-input" type="text" name="namber" placeholder="Забронюйте дату віконання"></span>
-					</p>
-					<a href="#" class="task-gr">Відправити завдання</a>
-				</div>
-        </div>
-    </div>
-</div>
-
-<div style="display: none;"> <!--   Оцінювання   -->
-    <div class="box-modal" id="exampleModal-8">
-        <div class="box-modal_close arcticmodal-close"><img src="img/close.png" class="close"></div>
-        <div>
-        		<textarea class="desk-task" name="desk-task" placeholder="Коментар вчителя"></textarea>
-        		<span class="warning">
-        			* Якщо залишити поле пустим, <br>
-   						то оцінка буде враховуваьись <br>
-   						як за гуртове завдання
-   			</span>	
-        		<select name="class" class="class-2">
-	         	  <option value="0">Оберіть учня</option>
-					  <option value="1">Учень 1</option>
-					  <option value="2">Учень 2</option>
-					  <option value="3">Учень 3</option>
-					  <option value="4">Учень 4</option>
-					  <option value="5">Учень 5</option>
-					  <option value="6">Учень 6</option>
-				</select>
-				<div>
-					<p class="d-flex justify-content-center grade-block">
-						Поставити оцінку: <input type="namber" class="grade">
-					</p>
-				</div>
-				<a href="#" class="task-grade">Оцінити</a>
-        </div>
-    </div>
-</div>
-
-<div style="display: none;"> <!--   Видалення учня з бази   -->
-    <div class="box-modal" id="exampleModal-9">
-        <div class="box-modal_close arcticmodal-close"><img src="img/close.png" class="close"></div>
-        <h3>Оберіть учня/учнів із списку:</h3>
-     			<ul class="stud-list-2 d-flex">
-					<li class="student-item d-flex">
-						<input type="checkbox">
-						<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-					</li>
-					<li class="student-item d-flex">
-						<input type="checkbox">
-						<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-					</li>
-					<li class="student-item d-flex">
-						<input type="checkbox">
-						<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-					</li>
-					<li class="student-item d-flex">
-						<input type="checkbox">
-						<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-					</li>
-					<li class="student-item d-flex">
-						<input type="checkbox">
-						<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-					</li>
-					<li class="student-item d-flex">
-						<input type="checkbox">
-						<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-					</li>
-					<li class="student-item d-flex">
-						<input type="checkbox">
-						<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-					</li>
-					<li class="student-item d-flex">
-						<input type="checkbox">
-						<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-					</li>
-					<li class="student-item d-flex">
-						<input type="checkbox">
-						<p>Ім'я Призвіще (<span>Логін</span>)</p> <!-- Сюди повинні потрапляти дані з форми реестрації -->
-					</li>
-				</ul>
-				<a href="#" class="delete">Видалити вибраних</a>
-    </div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div style="display: none;">
-    <div class="box-modal" id="exampleModal-10">
-        <div class="box-modal_close arcticmodal-close"><img src="static/img/close.png" class="close"></div>
-        <h2 id="formTitle" style="text-align: center;">Додати загальну подію</h2>
-        <div class="form">
-            <input type="hidden" id="eventId">
-            <div class="input-box">
-                <label>Назва події</label>
-                <input type="text" id="eventTitle" placeholder="Введіть назву події">
-            </div>
-            <div class="input-box">
-                <label>Дата і час</label>
-                <input type="text" id="eventDate" placeholder="Оберіть дату і час">
-            </div>
-            <div class="button">
-                <button onclick="saveEvent(event)">Зберегти</button>
-            </div>
-        </div>
-    </div>
+	<div class="box-modal" id="exampleModal-8">
+		<div class="box-modal_close arcticmodal-close"><img src="{{url_for('static', filename='img/close.png')}}" class="close"></div>
+		<div>
+			<textarea class="desk-task" name="desk-task" placeholder="Коментар вчителя"></textarea>
+			<span class="warning">
+				* Якщо залишити поле пустим, <br>
+				то оцінка буде враховуваьись <br>
+				як за гуртове завдання
+			</span>	
+			<select name="class" class="class-2">
+				<option value="0">Оберіть учня</option>
+				<option value="1">Учень 1</option>
+				<option value="2">Учень 2</option>
+				<option value="3">Учень 3</option>
+				<option value="4">Учень 4</option>
+				<option value="5">Учень 5</option>
+				<option value="6">Учень 6</option>
+			</select>
+			<div>
+				<p class="d-flex justify-content-center grade-block">
+					Поставити оцінку: <input type="number" class="grade">
+				</p>
+			</div>
+			<a href="#" class="task-grade">Оцінити</a>
+		</div>
+	</div>
 </div>
 
-<div style="display: none;"> <!--   Додавання окремої події при кліку на вільну подію у календарі   -->
-    <div class="box-modal" id="exampleModal-11">
-        <div class="box-modal_close arcticmodal-close"><img src="img/close.png" class="close"></div>
-        <div>
-        		<textarea class="add-p-bl" name="add-p-bl" placeholder="Описуємо подію"></textarea>
-        		<a href="#" class="add-p">Додати подію</a>
-        </div>
-    </div>
+<div style="display: none;">
+	<div class="box-modal" id="exampleModal-9">
+		<div class="box-modal_close arcticmodal-close"><img src="{{url_for('static', filename='img/close.png')}}" class="close"></div>
+		<h3>Оберіть учня/учнів із списку:</h3>
+		<ul class="stud-list-2 d-flex">
+			<li class="student-item d-flex">
+				<input type="checkbox">
+				<p>Ім'я Призвіще (<span>Логін</span>)</p>
+			</li>
+			<li class="student-item d-flex">
+				<input type="checkbox">
+				<p>Ім'я Призвіще (<span>Логін</span>)</p>
+			</li>
+			<li class="student-item d-flex">
+				<input type="checkbox">
+				<p>Ім'я Призвіще (<span>Логін</span>)</p>
+			</li>
+			<li class="student-item d-flex">
+				<input type="checkbox">
+				<p>Ім'я Призвіще (<span>Логін</span>)</p>
+			</li>
+			<li class="student-item d-flex">
+				<input type="checkbox">
+				<p>Ім'я Призвіще (<span>Логін</span>)</p>
+			</li>
+			<li class="student-item d-flex">
+				<input type="checkbox">
+				<p>Ім'я Призвіще (<span>Логін</span>)</p>
+			</li>
+			<li class="student-item d-flex">
+				<input type="checkbox">
+				<p>Ім'я Призвіще (<span>Логін</span>)</p>
+			</li>
+			<li class="student-item d-flex">
+				<input type="checkbox">
+				<p>Ім'я Призвіще (<span>Логін</span>)</p>
+			</li>
+			<li class="student-item d-flex">
+				<input type="checkbox">
+				<p>Ім'я Призвіще (<span>Логін</span>)</p>
+			</li>
+		</ul>
+		<a href="#" class="delete">Видалити вибраних</a>
+	</div>
 </div>
 
-	<!-- JQuery -->
-	<script src="js/jquery-3.3.1.min.js"></script>
-	<!-- slick -->
-	<script type="text/javascript" src="js/slick.min.js"></script>
-	<!-- Parallax -->
-	<script type="text/javascript" src="js/parallax-bg.js"></script>
-	<!-- Pop-up window js -->
-	<script src="js/jquery.arcticmodal-0.3.min.js"></script>
-	<!-- Validate -->
-	<script type="text/javascript" src="js/jquery.validate.js"></script>
-	<!-- Main JS -->
-	<script src="js/main.js"></script>
-	{% endblock %}
-</body>
-</html>
+<div style="display: none;">
+	<div class="box-modal" id="exampleModal-10">
+		<div class="box-modal_close arcticmodal-close"><img src="{{url_for('static', filename='img/close.png')}}" class="close"></div>
+		<h2 id="formTitle" style="text-align: center;">Додати загальну подію</h2>
+		<div class="form">
+			<input type="hidden" id="eventId">
+			<div class="input-box">
+				<label>Назва події</label>
+				<input type="text" id="eventTitle" placeholder="Введіть назву події">
+			</div>
+			<div class="input-box">
+				<label>Дата і час</label>
+				<input type="text" id="eventDate" placeholder="Оберіть дату і час">
+			</div>
+			<div class="button">
+				<button onclick="saveEvent(event)">Зберегти</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div style="display: none;">
+	<div class="box-modal" id="exampleModal-11">
+		<div class="box-modal_close arcticmodal-close"><img src="{{url_for('static', filename='img/close.png')}}" class="close"></div>
+		<div>
+			<div class="date">
+				<p id="selectedDateEvent"></p>
+			</div>
+			<div class="desc-date" id="eventDetailsEvent">
+				<p>Події відсутні</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var Cal = function(divId) {
+		this.divId = divId;
+		this.DaysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+		this.Months = ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
+		var d = new Date();
+		this.currMonth = d.getMonth();
+		this.currYear = d.getFullYear();
+		this.currDay = d.getDate();
+		this.events = [];
+	};
+
+	Cal.prototype.fetchEvents = async function() {
+		try {
+			const response = await fetch('/api/events', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+			this.events = await response.json();
+			console.log('Події з API:', this.events);
+		} catch (error) {
+			console.error('Помилка при отриманні подій:', error);
+		}
+	};
+
+	Cal.prototype.nextMonth = function() {
+		if (this.currMonth == 11) {
+			this.currMonth = 0;
+			this.currYear = this.currYear + 1;
+		} else {
+			this.currMonth = this.currMonth + 1;
+		}
+		this.showcurr();
+	};
+
+	Cal.prototype.previousMonth = function() {
+		if (this.currMonth == 0) {
+			this.currMonth = 11;
+			this.currYear = this.currYear - 1;
+		} else {
+			this.currMonth = this.currMonth - 1;
+		}
+		this.showcurr();
+	};
+
+	Cal.prototype.showcurr = function() {
+		this.showMonth(this.currYear, this.currMonth);
+	};
+
+	Cal.prototype.showMonth = function(y, m) {
+		var d = new Date();
+		var firstDayOfMonth = new Date(y, m, 7).getDay();
+		var lastDateOfMonth = new Date(y, m + 1, 0).getDate();
+		var lastDayOfLastMonth = m == 0 ? new Date(y - 1, 11, 0).getDate() : new Date(y, m, 0).getDate();
+
+		// Оновлюємо назву місяця та року
+		document.getElementById('monthYear').textContent = this.Months[m] + ' ' + y;
+
+		var html = '<table>';
+		html += '<tr class="days">';
+		for (var i = 0; i < this.DaysOfWeek.length; i++) {
+			html += '<td>' + this.DaysOfWeek[i] + '</td>';
+		}
+		html += '</tr>';
+
+		var i = 1;
+		do {
+			var dow = new Date(y, m, i).getDay();
+			if (dow == 1) {
+				html += '<tr>';
+			} else if (i == 1) {
+				html += '<tr>';
+				var k = lastDayOfLastMonth - firstDayOfMonth + 1;
+				for (var j = 0; j < firstDayOfMonth; j++) {
+					html += '<td class="not-current">' + k + '</td>';
+					k++;
+				}
+			}
+
+			var currentDate = new Date(y, m, i);
+			var eventsForDay = this.events.filter(event => {
+				var eventDate = new Date(event.date);
+				return eventDate.getFullYear() === y &&
+					   eventDate.getMonth() === m &&
+					   eventDate.getDate() === i;
+			});
+
+			var hasEvent = eventsForDay.length > 0;
+			var isPastEvent = false;
+			if (hasEvent) {
+				const now = new Date();
+				isPastEvent = eventsForDay.every(event => {
+					const eventDate = new Date(event.date);
+					return eventDate < now;
+				});
+			}
+
+			var chk = new Date();
+			var chkY = chk.getFullYear();
+			var chkM = chk.getMonth();
+			if (chkY == this.currYear && chkM == this.currMonth && i == this.currDay) {
+				html += `<td class="today${hasEvent ? (isPastEvent ? ' past-event-day' : ' event-day') : ''}"><a href="#" class="but-block but-block-${i}" onclick="calendarInstance.showDayEvents(${y}, ${m}, ${i}); return false;">${i}</a></td>`;
+			} else {
+				html += `<td class="normal${hasEvent ? (isPastEvent ? ' past-event-day' : ' event-day') : ''}"><a href="#" class="but-block but-block-${i}" onclick="calendarInstance.showDayEvents(${y}, ${m}, ${i}); return false;">${i}</a></td>`;
+			}
+
+			if (dow == 0) {
+				html += '</tr>';
+			} else if (i == lastDateOfMonth) {
+				var k = 1;
+				for (dow; dow < 7; dow++) {
+					html += '<td class="not-current">' + k + '</td>';
+					k++;
+				}
+			}
+			i++;
+		} while (i <= lastDateOfMonth);
+
+		html += '</table>';
+		document.getElementById(this.divId).innerHTML = html;
+	};
+
+	Cal.prototype.showDayEvents = function(year, month, day) {
+		const selectedDate = new Date(year, month, day);
+		const dayOfWeek = this.DaysOfWeek[selectedDate.getDay() === 0 ? 6 : selectedDate.getDay() - 1];
+		const dateStr = `${day} ${this.Months[month].toUpperCase()} ${year} - ${dayOfWeek}`;
+		document.getElementById('selectedDate').textContent = dateStr;
+
+		const eventsOnDay = this.events.filter(event => {
+			const eventDate = new Date(event.date);
+			return eventDate.getFullYear() === year &&
+				   eventDate.getMonth() === month &&
+				   eventDate.getDate() === day;
+		});
+
+		const eventContainer = document.getElementById('eventDetails');
+		eventContainer.innerHTML = '';
+
+		if (eventsOnDay.length > 0) {
+			eventsOnDay.forEach(event => {
+				const eventDate = new Date(event.date);
+				const timeStr = eventDate.toTimeString().slice(0, 5);
+				const eventHtml = `
+					<div>
+						<h2 class="event-title">${event.title || 'Без назви'}</h2>
+						<p class="event-desc">Час проведення: ${timeStr}</p>
+					</div>
+				`;
+				eventContainer.innerHTML += eventHtml;
+			});
+		} else {
+			eventContainer.innerHTML = `
+				<p>Не заплановано ніяких подій</p>
+			`;
+		}
+
+		try {
+			$.arcticmodal({
+				content: '#exampleModal-3'
+			});
+		} catch (error) {
+			console.error('Помилка при відкритті модального вікна (#exampleModal-3):', error);
+			alert('Не вдалося відкрити модальне вікно. Перевірте консоль для деталей.');
+		}
+	};
+
+	Cal.prototype.showAllEvents = function() {
+		document.getElementById('currentMonth').textContent = 
+			this.Months[this.currMonth] + ' ' + this.currYear;
+
+		const eventList = document.getElementById('eventList');
+		eventList.innerHTML = '';
+
+		const daysInMonth = new Date(this.currYear, this.currMonth + 1, 0).getDate();
+
+		for (let day = 1; day <= daysInMonth; day++) {
+			const eventsForDay = this.events.filter(event => {
+				const eventDate = new Date(event.date);
+				return eventDate.getFullYear() === this.currYear &&
+					   eventDate.getMonth() === this.currMonth &&
+					   eventDate.getDate() === day;
+			});
+
+			const li = document.createElement('li');
+			li.classList.add('event-item');
+			if (eventsForDay.length > 0) {
+				li.classList.add('activ-event-day');
+				const now = new Date();
+				const isPastEvent = eventsForDay.every(event => {
+					const eventDate = new Date(event.date);
+					return eventDate < now;
+				});
+				li.classList.add(isPastEvent ? 'past' : 'future');
+				eventsForDay.forEach(event => {
+					const eventDate = new Date(event.date);
+					const hours = String(eventDate.getHours()).padStart(2, '0');
+					const minutes = String(eventDate.getMinutes()).padStart(2, '0');
+					const time = `${hours}:${minutes}`;
+					const eventLi = document.createElement('div');
+					eventLi.classList.add('event-subitem');
+					eventLi.innerHTML = `
+						<p>${day} - ${event.title || 'Без назви'} (${time})</p>
+					`;
+					li.appendChild(eventLi);
+				});
+			} else {
+				li.classList.add('event-absent');
+				li.innerHTML = `<p>${day}</p><p>Не заплановано ніяка подія</p>`;
+			}
+			eventList.appendChild(li);
+		}
+
+		try {
+			$.arcticmodal({
+				content: '#exampleModal-5'
+			});
+		} catch (error) {
+			console.error('Помилка при відкритті модального вікна (#exampleModal-5):', error);
+			alert('Не вдалося відкрити модальне вікно. Перевірте консоль для деталей.');
+		}
+	};
+
+	// Ініціалізація календаря
+	const calendarInstance = new Cal('divCal');
+
+	// Завантажуємо події та відображаємо календар
+	calendarInstance.fetchEvents().then(() => {
+		calendarInstance.showcurr();
+	});
+
+	// Прив’язка подій до кнопок
+	document.getElementById('btnPrev').addEventListener('click', () => calendarInstance.previousMonth());
+	document.getElementById('btnNext').addEventListener('click', () => calendarInstance.nextMonth());
+	document.querySelector('.podii-2').addEventListener('click', (e) => {
+		e.preventDefault();
+		calendarInstance.showAllEvents();
+	});
+
+	// Відкриття модальних вікон
+	document.querySelector('.task-for-one').addEventListener('click', (e) => {
+		e.preventDefault();
+		flatpickr("#exampleModal-6 .namb-input", {
+			enableTime: false,
+			dateFormat: "Y-m-d",
+			defaultDate: new Date(),
+			locale: { firstDayOfWeek: 1 }
+		});
+		$.arcticmodal({
+			content: '#exampleModal-6'
+		});
+	});
+
+	document.querySelector('.task-for-group').addEventListener('click', (e) => {
+		e.preventDefault();
+		flatpickr("#exampleModal-7 .namb-input", {
+			enableTime: false,
+			dateFormat: "Y-m-d",
+			defaultDate: new Date(),
+			locale: { firstDayOfWeek: 1 }
+		});
+		$.arcticmodal({
+			content: '#exampleModal-7'
+		});
+	});
+
+	document.querySelector('.assessment').addEventListener('click', (e) => {
+		e.preventDefault();
+		$.arcticmodal({
+			content: '#exampleModal-8'
+		});
+	});
+
+	document.querySelector('.remove-student').addEventListener('click', (e) => {
+		e.preventDefault();
+		$.arcticmodal({
+			content: '#exampleModal-9'
+		});
+	});
+
+	document.querySelector('.general-event').addEventListener('click', (e) => {
+		e.preventDefault();
+		showEventForm();
+	});
+
+	function showEventForm() {
+		document.getElementById('formTitle').textContent = 'Додати загальну подію';
+		document.getElementById('formTitle').dataset.mode = 'add';
+		document.getElementById('eventId').value = '';
+		document.getElementById('eventTitle').value = '';
+
+		flatpickr("#eventDate", {
+			enableTime: true,
+			dateFormat: "Y-m-d H:i",
+			defaultDate: new Date(),
+			time_24hr: true,
+			minuteIncrement: 1,
+			locale: { firstDayOfWeek: 1 }
+		});
+
+		$.arcticmodal({
+			content: '#exampleModal-10'
+		});
+	}
+
+	async function saveEvent(event) {
+		event.preventDefault();
+		const eventId = document.getElementById('eventId').value;
+		const title = document.getElementById('eventTitle').value;
+		const date = document.getElementById('eventDate').value;
+
+		if (!title || !date) {
+			alert('Будь ласка, заповніть обов’язкові поля (назва і дата)');
+			return;
+		}
+
+		const eventDate = new Date(date);
+		const year = eventDate.getFullYear();
+		const month = String(eventDate.getMonth() + 1).padStart(2, '0');
+		const day = String(eventDate.getDate()).padStart(2, '0');
+		const hours = String(eventDate.getHours()).padStart(2, '0');
+		const minutes = String(eventDate.getMinutes()).padStart(2, '0');
+		const seconds = String(eventDate.getSeconds()).padStart(2, '0');
+		const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+		const eventData = {
+			title: title,
+			date: formattedDate
+		};
+
+		try {
+			let response;
+			if (eventId) {
+				response = await fetch(`/api/events/${eventId}`, {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(eventData)
+				});
+			} else {
+				response = await fetch('/api/events', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(eventData)
+				});
+			}
+
+			if (response.ok) {
+				await calendarInstance.fetchEvents();
+				calendarInstance.showcurr();
+				$.arcticmodal('close');
+			} else {
+				alert('Помилка при збереженні події');
+			}
+		} catch (error) {
+			console.error('Помилка при відправці запиту:', error);
+			alert('Помилка при збереженні події');
+		}
+	}
+</script>
+{% endblock %}
