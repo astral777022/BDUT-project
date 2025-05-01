@@ -4,7 +4,6 @@
 	Головна сторінка
 {% endblock %}
 
-<body>
 {% block content %}
 	<header class="header" id="header">
 		<div class="container">
@@ -26,7 +25,7 @@
 		  			<nav class="menu">
 						<ul class="menu__list d-flex">
 							<li class="menu__item">
-								<a class="menu__registr" href="#">Реєстрація</a>
+								<a class="menu__registr" href="#">Реестрація</a>
 							</li>
 							<li class="menu__item">
 								<a class="menu__exit" href="#">Вхід</a>
@@ -39,12 +38,8 @@
 	</header>
 
 	<section class="offer" id="offer" data-type="background" data-speed="5">
-		<div class="header-back">
-			
-		</div>
-		<div class="back">
-			
-		</div>
+		<div class="header-back"></div>
+		<div class="back"></div>
 		<div class="container">
 			<div class="row">
 				<div class="col-12">
@@ -58,7 +53,7 @@
 						Гостинно двері ти нам відчиняєш.<br>
 						Зігріті ми любов’ю і теплом твоїм,<br>
 						Прекрасними людьми<br>
-						у стінах цих зростаєм.
+						У стінах цих зростаєм.
 					</p>
 				</div>
 			</div>
@@ -70,265 +65,26 @@
 			<div class="row">
 				<div class="center d-flex col-sm-12 col-md-6"> 
 					<div class="calendar-wrapper">
-						<button id="btnPrev" type="button">Попередній</button>
-						<button id="btnNext" type="button">Наступний</button>
-						<div id="divCal">
-							
+						<div class="calendar-header">
+							<button id="btnPrev" type="button">Попередній</button>
+							<span id="monthYear"></span>
+							<button id="btnNext" type="button">Наступний</button>
 						</div>
-						<a href="#" class="podii-2">Всі подіі цього місяця</a>
+						<div id="divCal" class="calendar-table"></div>
+						<div class="calendar-buttons">
+							<a href="#" class="podii-2">Всі події цього місяця</a>
+						</div>
 					</div>
-					<script type="text/javascript">
-						var Cal = function(divId) {
-							this.divId = divId;
-							//Дні тижня з понеділка
-							this.DaysOfWeek = [
-								'Пн', 
-								'Вт', 
-								'Ср', 
-								'Чт', 
-								'Пт', 
-								'Сб', 
-								'Нд'
-							];
-							// Місяці починая з січня
-							this.Months = ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
-							// Поточний місяц, рік
-							var d = new Date();
-							this.currMonth = d.getMonth();
-							this.currYear = d.getFullYear();
-							this.currDay = d.getDate();
-							this.events = [];
-						};
-						// Перехід до наступного місяця
-						Cal.prototype.fetchEvents = async function() {
-							try {
-								const response = await fetch('/api/events', {
-									method: 'GET',
-									headers: {
-										'Content-Type': 'application/json'
-									}
-								});
-								this.events = await response.json();
-								console.log('Події з API (index.html):', this.events);
-							} catch (error) {
-								console.error('Помилка при отриманні подій:', error);
-							}
-						};
-
-						Cal.prototype.nextMonth = function() {
-							if (this.currMonth == 11) {
-								this.currMonth = 0;
-								this.currYear = this.currYear + 1;
-							} else {
-								this.currMonth = this.currMonth + 1;
-							}
-							this.showcurr();
-						};
-						// Перехід до попереднього місяця
-						Cal.prototype.previousMonth = function() {
-							if (this.currMonth == 0) {
-								this.currMonth = 11;
-								this.currYear = this.currYear - 1;
-							} else {
-								this.currMonth = this.currMonth - 1;
-							}
-							this.showcurr();
-						};
-
-						// Показати поточний місяць
-						Cal.prototype.showcurr = function() {
-							this.showMonth(this.currYear, this.currMonth);
-						};
-						// Показати місяць (рік, місяць)
-						Cal.prototype.showMonth = function(y, m) {
-							var d = new Date();
-							// Перший день неділі в обраному місяці
-							var firstDayOfMonth = new Date(y, m, 7).getDay();
-							// Останній день попереднього місяця
-							var lastDateOfMonth = new Date(y, m + 1, 0).getDate();
-							var lastDayOfLastMonth = m == 0 ? new Date(y - 1, 11, 0).getDate() : new Date(y, m, 0).getDate();
-
-							var html = '<table>';
-							// Запис обраного місяця і року
-							html += '<thead><tr>';
-							html += '<td colspan="7">' + this.Months[m] + ' ' + y + '</td>';
-							html += '</tr></thead>';
-							// Заголовок днів неділі
-							html += '<tr class="days">';
-							for (var i = 0; i < this.DaysOfWeek.length; i++) {
-								html += '<td>' + this.DaysOfWeek[i] + '</td>';
-							}
-							html += '</tr>';
-							// Записуємо дні
-							var i = 1;
-							do {
-								var dow = new Date(y, m, i).getDay();
-								// Почати новий рядок з понеділка
-								if (dow == 1) {
-									html += '<tr>';
-								} 
-								// Якщо перший день неділі не понеділок, то показати останні дні попереднього місяця
-								else if (i == 1) {
-									html += '<tr>';
-									var k = lastDayOfLastMonth - firstDayOfMonth + 1;
-									for (var j = 0; j < firstDayOfMonth; j++) {
-										html += '<td class="not-current">' + k + '</td>';
-										k++;
-									}
-								}
-								// Записуємо поточний день у цикл
-								var currentDate = new Date(y, m, i);
-								var hasEvent = this.events.some(event => {
-									var eventDate = new Date(event.date);
-									return eventDate.getFullYear() === y &&
-										   eventDate.getMonth() === m &&
-										   eventDate.getDate() === i;
-								});
-
-								var chk = new Date();
-								var chkY = chk.getFullYear();
-								var chkM = chk.getMonth();
-								if (chkY == this.currYear && chkM == this.currMonth && i == this.currDay) {
-									html += `<td class="today${hasEvent ? ' event-day' : ''}"><a href="#" class="but-block but-block-${i}" onclick="calendarInstance.showDayEvents(${y}, ${m}, ${i}); return false;">${i}</a></td>`;
-								} else {
-									html += `<td class="normal${hasEvent ? ' event-day' : ''}"><a href="#" class="but-block but-block-${i}" onclick="calendarInstance.showDayEvents(${y}, ${m}, ${i}); return false;">${i}</a></td>`;
-								}
-								// Закриваємо рядок у неділю
-								if (dow == 0) {
-									html += '</tr>';
-								} 
-								// Якщо останній день місяця не неділя, то показуємо перші дні наступного місяця
-								else if (i == lastDateOfMonth) {
-									var k = 1;
-									for (dow; dow < 7; dow++) {
-										html += '<td class="not-current">' + k + '</td>';
-										k++;
-									}
-								}
-								i++;
-							} 
-							while (i <= lastDateOfMonth);
-							// Кінець таблиці
-							html += '</table>';
-							// Записуємо HTML у div
-							document.getElementById(this.divId).innerHTML = html;
-						};
-						// При завантажуванні вікна
-						Cal.prototype.showDayEvents = function(year, month, day) {
-							const selectedDate = new Date(year, month, day);
-							const dayOfWeek = this.DaysOfWeek[selectedDate.getDay() === 0 ? 6 : selectedDate.getDay() - 1];
-							const dateStr = `${day} ${this.Months[month].toUpperCase()} ${year} - ${dayOfWeek}`;
-							document.querySelector('#exampleModal-3 .date p').textContent = dateStr;
-
-							const eventsOnDay = this.events.filter(event => {
-								const eventDate = new Date(event.date);
-								return eventDate.getFullYear() === year &&
-									   eventDate.getMonth() === month &&
-									   eventDate.getDate() === day;
-							});
-
-							const eventContainer = document.querySelector('#exampleModal-3 .event-details');
-							eventContainer.innerHTML = '';
-
-							if (eventsOnDay.length > 0) {
-								eventsOnDay.forEach(event => {
-									const eventDate = new Date(event.date);
-									const timeStr = eventDate.toTimeString().slice(0, 5);
-									const eventHtml = `
-										<div>
-											<h2 class="event-title">${event.title || 'Без назви'}</h2>
-											<i><p class="event-desc">Час проведення: ${timeStr}</p></i>
-										</div>
-									`;
-									eventContainer.innerHTML += eventHtml;
-								});
-							} else {
-								eventContainer.innerHTML = `
-									<div class="desc-date">
-										<p>Не заплановано ніяких подій</p>
-									</div>
-								`;
-							}
-
-							$.arcticmodal({
-								content: '#exampleModal-3'
-							});
-						};
-
-						Cal.prototype.showMonthEvents = function() {
-							const monthStr = `${this.Months[this.currMonth]} ${this.currYear}`;
-							document.querySelector('#exampleModal-4 .date p').textContent = monthStr;
-
-							const lastDateOfMonth = new Date(this.currYear, this.currMonth + 1, 0).getDate();
-							const eventList = document.querySelector('#exampleModal-4 .list-event');
-							eventList.innerHTML = '';
-
-							for (let day = 1; day <= lastDateOfMonth; day++) {
-								const eventsOnDay = this.events.filter(event => {
-									const eventDate = new Date(event.date);
-									return eventDate.getFullYear() === this.currYear &&
-										   eventDate.getMonth() === this.currMonth &&
-										   eventDate.getDate() === day;
-								});
-
-								const li = document.createElement('li');
-								if (eventsOnDay.length > 0) {
-									li.className = 'activ-event-day';
-									eventsOnDay.forEach(event => {
-										const eventDate = new Date(event.date);
-										const timeStr = eventDate.toTimeString().slice(0, 5);
-										li.innerHTML = `
-											<p>${day}</p>
-											<p>${event.title || 'Без назви'} (${timeStr})</p>
-										`;
-									});
-								} else {
-									li.innerHTML = `
-										<p>${day}</p>
-										<p>Не заплановано ніяка подія</p>
-									`;
-								}
-								eventList.appendChild(li);
-							}
-
-							$.arcticmodal({
-								content: '#exampleModal-4'
-							});
-						};
-
-						let calendarInstance;
-						window.onload = async function() {
-							calendarInstance = new Cal("divCal");
-							await calendarInstance.fetchEvents();
-							calendarInstance.showcurr();
-
-							getId('btnNext').onclick = function() {
-								calendarInstance.nextMonth();
-							};
-							getId('btnPrev').onclick = function() {
-								calendarInstance.previousMonth();
-							};
-
-							document.querySelector('.podii-2').onclick = function(e) {
-								e.preventDefault();
-								calendarInstance.showMonthEvents();
-							};
-						};
-
-						function getId(id) {
-							return document.getElementById(id);
-						}
-					</script>	
 				</div>
 				<div class="d-flex col-sm-12 col-md-6 main-slide m-auto">
 					<div class="slide-block">
-						<img src="{{url_for('static', filename='img/photo_2024-12-26_23-22-22.jpg')}}" class="slide-block__img"></img>
+						<img src="{{url_for('static', filename='img/photo_2024-12-26_23-22-22.jpg')}}" class="slide-block__img">
 					</div>
 					<div class="slide-block">
-						<img src="{{url_for('static', filename='img/002.jpg')}}" class="slide-block__img"></img>
+						<img src="{{url_for('static', filename='img/002.jpg')}}" class="slide-block__img">
 					</div>
 					<div class="slide-block">
-						<img src="{{url_for('static', filename='img/003.jpg')}}" class="slide-block__img"></img>
+						<img src="{{url_for('static', filename='img/003.jpg')}}" class="slide-block__img">
 					</div>
 				</div>
 			</div>
@@ -357,27 +113,17 @@
 						<option value="4">Клас 4</option>
 						<option value="5">Клас 5</option>
 						<option value="6">Клас 6</option>
+						<option value="3">Клас 7</option>
+						<option value="4">Клас 8</option>
+						<option value="5">Клас 9</option>
+						<option value="6">Клас 10</option>
+						<option value="6">Клас 11</option>
 					</select>
 					<p class="radio-text">Хто ви?<br>Зробіть свій вибір!</p>
 					<select name="role" class="class" required>
 						<option value="student">Учень</option>
 						<option value="parent">Батьки</option>
 					</select>
-
-<!--					<div class="container-radio d-flex">
-						<div class="radio d-flex">
-							<label for="radio-1" class="radio-label">Вчитель</label>
-							<input id="radio-1" name="radio" type="radio">
-						</div>
-						<div class="radio d-flex">
-							<label for="radio-2" class="radio-label">Учень</label>
-							<input id="radio-2" name="radio" type="radio">
-						</div>
-						<div class="radio d-flex">
-							<label for="radio-3" class="radio-label">Батьки</label>
-							<input id="radio-3" name="radio" type="radio">
-						</div>
-					</div> -->
 
 					<input type="password" id="pass-f1" class="modal-input" name="password" minlength="6" placeholder="Введіть пароль" required>
 					<button class="button modal-button" type="data-submit">Реєструватися</button>
@@ -391,7 +137,7 @@
 			<div class="box-modal_close arcticmodal-close"><img src="{{url_for('static', filename='img/close.png')}}" class="close"></div>
 			<form action="/success.php" class="modal-2__form d-flex flex-column js-form" id="popupResult-2">
 				<div class="modal-2__block-input d-flex flex-column">
-					<input id="name-f2" class="modal-input" type="text" name="name" placeholder="Логін">
+					<input id="name-f2" class="modal-input" type="text" name="login" placeholder="Ваш e-mail">
 					<input type="password" id="pass-f2" class="modal-input" name="password" minlength="6" placeholder="Введіть пароль">
 				</div>
 				<button class="button modal-button" data-submit>Увійти</button>
@@ -399,35 +145,283 @@
 		</div>
 	</div>
 
-	<div style="display: none;"> <!-- Вікно кліка на дні у календарі -->
+	<div style="display: none;">
 		<div class="box-modal" id="exampleModal-3">
 			<div class="box-modal_close arcticmodal-close"><img src="{{url_for('static', filename='img/close.png')}}" class="close"></div>
 			<div>
 				<div class="date">
-					<p>Сюди повинна потрапляти поточна дата</p>
+					<p id="selectedDate"></p>
 				</div>
-				<div class="event-details">
-					<!-- Сюди динамічно додаються події -->
+				<div class="desc-date" id="eventDetails">
+					<p>Події відсутні</p>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div style="display: none;"> <!-- Вікно усіх загальних подій -->
+	<div style="display: none;">
 		<div class="box-modal" id="exampleModal-4">
 			<div class="box-modal_close arcticmodal-close"><img src="{{url_for('static', filename='img/close.png')}}" class="close"></div>
 			<div class="date">
-				<p>Сюди повиннен потрапляти поточний місяць</p>
+				<p id="currentMonth"></p>
 			</div>
-			<ul class="list-event">
-				<!-- Сюди динамічно додаються події -->
-			</ul>
+			<ul class="list-event" id="eventList"></ul>
 		</div>
 	</div>
-	<div id="overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999;"></div>
-{% endblock %}
-</body>
-</html>
 
-</body>
-</html>
+	<script type="text/javascript">
+		var Cal = function(divId) {
+			this.divId = divId;
+			this.DaysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+			this.Months = ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
+			var d = new Date();
+			this.currMonth = d.getMonth();
+			this.currYear = d.getFullYear();
+			this.currDay = d.getDate();
+			this.events = [];
+		};
+
+		Cal.prototype.fetchEvents = async function() {
+			try {
+				const response = await fetch('/api/events', {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				});
+				this.events = await response.json();
+				console.log('Події з API:', this.events);
+			} catch (error) {
+				console.error('Помилка при отриманні подій:', error);
+			}
+		};
+
+		Cal.prototype.nextMonth = function() {
+			if (this.currMonth == 11) {
+				this.currMonth = 0;
+				this.currYear = this.currYear + 1;
+			} else {
+				this.currMonth = this.currMonth + 1;
+			}
+			this.showcurr();
+		};
+
+		Cal.prototype.previousMonth = function() {
+			if (this.currMonth == 0) {
+				this.currMonth = 11;
+				this.currYear = this.currYear - 1;
+			} else {
+				this.currMonth = this.currMonth - 1;
+			}
+			this.showcurr();
+		};
+
+		Cal.prototype.showcurr = function() {
+			this.showMonth(this.currYear, this.currMonth);
+		};
+
+		Cal.prototype.showMonth = function(y, m) {
+			var d = new Date();
+			var firstDayOfMonth = new Date(y, m, 7).getDay();
+			var lastDateOfMonth = new Date(y, m + 1, 0).getDate();
+			var lastDayOfLastMonth = m == 0 ? new Date(y - 1, 11, 0).getDate() : new Date(y, m, 0).getDate();
+
+			// Оновлюємо назву місяця та року
+			document.getElementById('monthYear').textContent = this.Months[m] + ' ' + y;
+
+			var html = '<table>';
+			html += '<tr class="days">';
+			for (var i = 0; i < this.DaysOfWeek.length; i++) {
+				html += '<td>' + this.DaysOfWeek[i] + '</td>';
+			}
+			html += '</tr>';
+
+			var i = 1;
+			do {
+				var dow = new Date(y, m, i).getDay();
+				if (dow == 1) {
+					html += '<tr>';
+				} else if (i == 1) {
+					html += '<tr>';
+					var k = lastDayOfLastMonth - firstDayOfMonth + 1;
+					for (var j = 0; j < firstDayOfMonth; j++) {
+						html += '<td class="not-current">' + k + '</td>';
+						k++;
+					}
+				}
+
+				var currentDate = new Date(y, m, i);
+				var eventsForDay = this.events.filter(event => {
+					var eventDate = new Date(event.date);
+					return eventDate.getFullYear() === y &&
+						   eventDate.getMonth() === m &&
+						   eventDate.getDate() === i;
+				});
+
+				var hasEvent = eventsForDay.length > 0;
+				var isPastEvent = false;
+				if (hasEvent) {
+					const now = new Date();
+					isPastEvent = eventsForDay.every(event => {
+						const eventDate = new Date(event.date);
+						return eventDate < now;
+					});
+				}
+
+				var chk = new Date();
+				var chkY = chk.getFullYear();
+				var chkM = chk.getMonth();
+				if (chkY == this.currYear && chkM == this.currMonth && i == this.currDay) {
+					html += `<td class="today${hasEvent ? (isPastEvent ? ' past-event-day' : ' event-day') : ''}"><a href="#" class="but-block but-block-${i}" onclick="calendarInstance.showDayEvents(${y}, ${m}, ${i}); return false;">${i}</a></td>`;
+				} else {
+					html += `<td class="normal${hasEvent ? (isPastEvent ? ' past-event-day' : ' event-day') : ''}"><a href="#" class="but-block but-block-${i}" onclick="calendarInstance.showDayEvents(${y}, ${m}, ${i}); return false;">${i}</a></td>`;
+				}
+
+				if (dow == 0) {
+					html += '</tr>';
+				} else if (i == lastDateOfMonth) {
+					var k = 1;
+					for (dow; dow < 7; dow++) {
+						html += '<td class="not-current">' + k + '</td>';
+						k++;
+					}
+				}
+				i++;
+			} while (i <= lastDateOfMonth);
+
+			html += '</table>';
+			document.getElementById(this.divId).innerHTML = html;
+		};
+
+		Cal.prototype.showDayEvents = function(year, month, day) {
+			const selectedDate = new Date(year, month, day);
+			const dayOfWeek = this.DaysOfWeek[selectedDate.getDay() === 0 ? 6 : selectedDate.getDay() - 1];
+			const dateStr = `${day} ${this.Months[month].toUpperCase()} ${year} - ${dayOfWeek}`;
+			document.getElementById('selectedDate').textContent = dateStr;
+
+			const eventsOnDay = this.events.filter(event => {
+				const eventDate = new Date(event.date);
+				return eventDate.getFullYear() === year &&
+					   eventDate.getMonth() === month &&
+					   eventDate.getDate() === day;
+			});
+
+			const eventContainer = document.getElementById('eventDetails');
+			eventContainer.innerHTML = '';
+
+			if (eventsOnDay.length > 0) {
+				eventsOnDay.forEach(event => {
+					const eventDate = new Date(event.date);
+					const timeStr = eventDate.toTimeString().slice(0, 5);
+					const eventHtml = `
+						<div>
+							<h2 class="event-title">${event.title || 'Без назви'}</h2>
+							<p class="event-desc">Час проведення: ${timeStr}</p>
+						</div>
+					`;
+					eventContainer.innerHTML += eventHtml;
+				});
+			} else {
+				eventContainer.innerHTML = `
+					<p>Не заплановано ніяких подій</p>
+				`;
+			}
+
+			try {
+				$.arcticmodal({
+					content: '#exampleModal-3'
+				});
+			} catch (error) {
+				console.error('Помилка при відкритті модального вікна (#exampleModal-3):', error);
+				alert('Не вдалося відкрити модальне вікно. Перевірте консоль для деталей.');
+			}
+		};
+
+		Cal.prototype.showAllEvents = function() {
+			document.getElementById('currentMonth').textContent = 
+				this.Months[this.currMonth] + ' ' + this.currYear;
+
+			const eventList = document.getElementById('eventList');
+			eventList.innerHTML = '';
+
+			const daysInMonth = new Date(this.currYear, this.currMonth + 1, 0).getDate();
+
+			for (let day = 1; day <= daysInMonth; day++) {
+				const eventsForDay = this.events.filter(event => {
+					const eventDate = new Date(event.date);
+					return eventDate.getFullYear() === this.currYear &&
+						   eventDate.getMonth() === this.currMonth &&
+						   eventDate.getDate() === day;
+				});
+
+				const li = document.createElement('li');
+				li.classList.add('event-item');
+				if (eventsForDay.length > 0) {
+					li.classList.add('activ-event-day');
+					const now = new Date();
+					const isPastEvent = eventsForDay.every(event => {
+						const eventDate = new Date(event.date);
+						return eventDate < now;
+					});
+					li.classList.add(isPastEvent ? 'past' : 'future');
+					eventsForDay.forEach(event => {
+						const eventDate = new Date(event.date);
+						const hours = String(eventDate.getHours()).padStart(2, '0');
+						const minutes = String(eventDate.getMinutes()).padStart(2, '0');
+						const time = `${hours}:${minutes}`;
+						const eventLi = document.createElement('div');
+						eventLi.classList.add('event-subitem');
+						eventLi.innerHTML = `
+							<p>${day} - ${event.title || 'Без назви'} (${time})</p>
+						`;
+						li.appendChild(eventLi);
+					});
+				} else {
+					li.classList.add('event-absent');
+					li.innerHTML = `<p>${day}</p><p>Не заплановано ніяка подія</p>`;
+				}
+				eventList.appendChild(li);
+			}
+
+			try {
+				$.arcticmodal({
+					content: '#exampleModal-4'
+				});
+			} catch (error) {
+				console.error('Помилка при відкритті модального вікна (#exampleModal-4):', error);
+				alert('Не вдалося відкрити модальне вікно. Перевірте консоль для деталей.');
+			}
+		};
+
+		// Ініціалізація календаря
+		const calendarInstance = new Cal('divCal');
+
+		// Завантажуємо події та відображаємо календар
+		calendarInstance.fetchEvents().then(() => {
+			calendarInstance.showcurr();
+		});
+
+		// Прив’язка подій до кнопок
+		document.getElementById('btnPrev').addEventListener('click', () => calendarInstance.previousMonth());
+		document.getElementById('btnNext').addEventListener('click', () => calendarInstance.nextMonth());
+		document.querySelector('.podii-2').addEventListener('click', (e) => {
+			e.preventDefault();
+			calendarInstance.showAllEvents();
+		});
+
+		// Відкриття модальних вікон для реєстрації та входу
+		document.querySelector('.menu__registr').addEventListener('click', (e) => {
+			e.preventDefault();
+			$.arcticmodal({
+				content: '#exampleModal-1'
+			});
+		});
+
+		document.querySelector('.menu__exit').addEventListener('click', (e) => {
+			e.preventDefault();
+			$.arcticmodal({
+				content: '#exampleModal-2'
+			});
+		});
+	</script>
+{% endblock %}
